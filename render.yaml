@@ -9,9 +9,9 @@ services:
     plan: free
     name: stream-app-api
     runtime: python
-    buildCommand: './build.sh'
-    startCommand: 'python -m gunicorn stream.asgi:application -k uvicorn.workers.UvicornWorker'
-    envVars:
+  buildCommand: './build.sh'
+  startCommand: 'gunicorn stream.asgi:application -k uvicorn.workers.UvicornWorker -w $WEB_CONCURRENCY -b 0.0.0.0:$PORT --timeout 120 --access-logfile -'
+  envVars:
       - key: DATABASE_URL
         fromDatabase:
           name: stream-app
@@ -20,3 +20,9 @@ services:
         generateValue: true
       - key: WEB_CONCURRENCY
         value: 4
+      - key: CLOUDINARY_CLOUD_NAME
+        value: ""
+      - key: CLOUDINARY_API_KEY
+        value: ""
+      - key: CLOUDINARY_API_SECRET
+        value: ""
