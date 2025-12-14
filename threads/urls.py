@@ -5,7 +5,10 @@ from .views import (
     UserThreadPostsView,
     ThreadPostCreateView,
     ThreadCommentListCreateView,
-    ThreadLikeToggleView
+    ThreadLikeToggleView,
+    ThreadCommentLikeToggleView,
+    ThreadCommentReplyListCreateView,
+    ThreadCommentReplyLikeToggleView
 )
 
 urlpatterns = [
@@ -14,5 +17,8 @@ urlpatterns = [
     path('create/', ThreadPostCreateView.as_view(), name='thread-create'),
     path('posts/<int:pk>/', ThreadPostDetailView.as_view(), name='thread-details'),
     path('posts/<int:pk>/comments/', ThreadCommentListCreateView.as_view(), name='thread-comments'),
-    path('posts/<int:pk>/like/', ThreadLikeToggleView.as_view(), name='thread-like')
+    path('posts/<int:pk>/like/', ThreadLikeToggleView.as_view(), name='thread-like'),
+    path('comments/<int:pk>/like/', ThreadCommentLikeToggleView.as_view(), name='comment-like'),
+    path('comments/<int:pk>/replies/', ThreadCommentReplyListCreateView.as_view(), name='comment-replies'),
+    path('replies/<int:pk>/like/', ThreadCommentReplyLikeToggleView.as_view(), name='reply-like'),
 ]
