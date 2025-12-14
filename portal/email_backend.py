@@ -1,25 +1,19 @@
-from django.core.mail.backends.base import BaseEmailBackend
 import requests
+from django.conf import settings
 
-class APIEmailBackend(BaseEmailBackend):
-    """
-    Custom email backend that sends emails via an external API.
-    """
-    def send_messages(self, email_messages):
-        sent_count = 0
-        for message in email_messages:
-            data = {
-                "to": message.to,
-                "subject": message.subject,
-                "body": message.body,
-                "from": "Stream <emailsender880@gmail.com>",
-            }
-           
-            response = requests.post(
-                "https://christiangarcia.pythonanywhere.com/send",
-                json=data,
-                timeout=10
-            )
-            if response.status_code == 200:
-                sent_count += 1
-        return sent_count
+def send_email_via_api(to_email, subject, body):
+    payload = {
+        "to": to_email,
+        "subject": subject,
+        "body": body,
+        "sender": "Stream App"
+    }
+
+    response = requests.post(
+        settings.EMAIL_API_URL,
+        json=payload,
+        timeout=getattr(settings, "EMAIL_API_TIMEOUT", 10)
+    )
+
+    response.raise_for_status()
+    return response.json()
