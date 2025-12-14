@@ -11,7 +11,8 @@ class Notification(models.Model):
         ('new_post', 'New Post'),
         ('like_comment', 'Like Comment'),
         ('like_reply', 'Like Reply'),
-        ('reply_comment', 'Reply Comment')
+        ('reply_comment', 'Reply Comment'),
+        ('announcement', 'Announcement')
     )
     
     recipient = models.ForeignKey(
