@@ -180,39 +180,34 @@ SIMPLE_JWT = {
 
 
 # -- CORS CONFIGURATION --
+
 CORS_ALLOWED_ORIGINS = [
     "https://snsu-community-forum-app.vercel.app",
     "https://christiangarcia.pythonanywhere.com",
     "http://localhost:8100"
 ]
-
 CORS_ALLOW_CREDENTIALS = True
 
 
-# -- EMAIL / SMTP CONFIGURATION --
-EMAIL_BACKEND = "portal.email_backends.APIEmailBackend"
+# -- EMAIL CONFIGURATION --
+EMAIL_API_URL = 'https://christiangarcia.pythonanywhere.com/send'
+EMAIL_API_TIMEOUT = 10
 
-'''
-EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend" 
-EMAIL_HOST = os.environ.get('EMAIL_HOST')
-EMAIL_PORT = int(os.environ.get('EMAIL_PORT'))
-EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
-EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
-EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS') == 'True'
-DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL')
-'''
 
 # --- MEDIA FILES CONFIGURATION ---
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-# -- CORS CONFIGURATION --
 
-CORS_ALLOWED_ORIGINS = [
-    "https://snsu-community-forum-app.vercel.app",
-    "http://localhost:8100"
-]
-CORS_ALLOW_CREDENTIALS = True
+# -- CLOUDINARY CONFIGURATION --
+CLOUDINARY_STORAGE = {
+    "CLOUD_NAME": os.getenv("CLOUDINARY_CLOUD_NAME"),
+    "API_KEY": os.getenv("CLOUDINARY_API_KEY"),
+    "API_SECRET": os.getenv("CLOUDINARY_API_SECRET"),
+}
+
+DEFAULT_FILE_STORAGE = "cloudinary_storage.storage.MediaCloudinaryStorage"
+
 
 
 # -- JAZZMIN CONFIGURATION --
