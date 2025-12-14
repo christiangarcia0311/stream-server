@@ -14,9 +14,6 @@ from datetime import timedelta
 from pathlib import Path
 import os 
 
-import cloudinary
-import cloudinary_storage
-
 # database url 
 import dj_database_url
 
