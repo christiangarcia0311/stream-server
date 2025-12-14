@@ -195,8 +195,8 @@ EMAIL_API_TIMEOUT = 10
 
 
 # --- MEDIA FILES CONFIGURATION ---
-MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+#MEDIA_URL = '/media/'
+#MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 
 # -- CLOUDINARY CONFIGURATION --
