@@ -78,3 +78,62 @@ def create_new_post_notification(thread, author):
     
     if notifications:
         Notification.objects.bulk_create(notifications)
+
+
+def create_comment_like_notification(comment, user):
+    
+    '''
+    Create notification when someone likes a comment
+    Only notifies if the liker is not the comment author
+    '''
+    
+    if comment.author != user:
+        user_name = f"{user.profile.firstname} {user.profile.lastname}" if hasattr(user, 'profile') else user.username
+        Notification.objects.create(
+            recipient=comment.author,
+            sender=user,
+            notification_type='like_comment',
+            thread=comment.thread,
+            comment=comment,
+            message=f'{user_name} liked your comment'
+        )
+
+
+def create_reply_like_notification(reply, user):
+    
+    '''
+    Create notification when someone likes a reply
+    Only notifies if the liker is not the reply author
+    '''
+    
+    if reply.author != user:
+        user_name = f"{user.profile.firstname} {user.profile.lastname}" if hasattr(user, 'profile') else user.username
+        Notification.objects.create(
+            recipient=reply.author,
+            sender=user,
+            notification_type='like_reply',
+            thread=reply.comment.thread,
+            comment=reply.comment,
+            reply=reply,
+            message=f'{user_name} liked your reply'
+        )
+
+
+def create_reply_notification(reply, comment, user):
+    
+    '''
+    Create notification when someone replies to a comment
+    Only notifies if the replier is not the comment author
+    '''
+    
+    if comment.author != user:
+        user_name = f"{user.profile.firstname} {user.profile.lastname}" if hasattr(user, 'profile') else user.username
+        Notification.objects.create(
+            recipient=comment.author,
+            sender=user,
+            notification_type='reply_comment',
+            thread=comment.thread,
+            comment=comment,
+            reply=reply,
+            message=f'{user_name} replied to your comment'
+        )
