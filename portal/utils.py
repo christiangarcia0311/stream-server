@@ -16,14 +16,14 @@ def create_send_otp_verification_code(user, request=None, force_regen: bool = Fa
         otp_obj.secret = pyotp.random_base32()
         otp_obj.is_verified = False
         otp_obj.updated_at = timezone.now()
-        otp_obj.save()
+        otp_obj.save() 
 
-    totp = pyotp.TOTP(otp_obj.secret)
+    totp = pyotp.TOTP(otp_obj.secret, interval=60)
     code = totp.now()
     
     subject = 'Stream - Verify your account'
     firstname = getattr(getattr(user, 'profile', None), 'firstname', None) or user.username
-    message = f'Hello {firstname},\n\nYour verification code is: {code}\n\nThis code is valid for a short time. If you did not request this, please ignore this message.'
+    message = f'Hello {firstname},\n\nYour verification code is: {code}\n\nThis code is valid for 1 minute. If you did not request this, please ignore this message.\n\nThank you,\nStream Team | Developer'
     
     # Debug logging
     print(f"[OTP DEBUG] Sending OTP to: {user.email}, code: {code}")
