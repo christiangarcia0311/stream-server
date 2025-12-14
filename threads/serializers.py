@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import ThreadPost, ThreadComment, ThreadLike
+from .models import ThreadPost, ThreadComment, ThreadLike, ThreadCommentReply, ThreadCommentLike, ThreadCommentReplyLike
 from portal.serializers import UserProfileDetailSerializer
 
 class ThreadPostSerializer(serializers.ModelSerializer):
@@ -70,6 +70,9 @@ class ThreadPostCreateSerializer(serializers.ModelSerializer):
 class ThreadCommentSerializer(serializers.ModelSerializer):
     author_profile = UserProfileDetailSerializer(source='author.profile', read_only=True)
     author_username = serializers.CharField(source='author.username', read_only=True)
+    likes_count = serializers.SerializerMethodField()
+    is_liked = serializers.SerializerMethodField()
+    replies_count = serializers.SerializerMethodField()
     
     class Meta:
         model = ThreadComment
@@ -80,10 +83,55 @@ class ThreadCommentSerializer(serializers.ModelSerializer):
             'author_username', 
             'author_profile', 
             'content', 
-            'created_at'
+            'created_at',
+            'likes_count',
+            'is_liked',
+            'replies_count'
         ]
         
         read_only_fields = ['author', 'created_at']
+    
+    def get_likes_count(self, obj):
+        return obj.likes.count()
+    
+    def get_is_liked(self, obj):
+        request = self.context.get('request')
+        if request and request.user.is_authenticated:
+            return ThreadCommentLike.objects.filter(comment=obj, user=request.user).exists()
+        return False
+    
+    def get_replies_count(self, obj):
+        return obj.replies.count()
+
+class ThreadCommentReplySerializer(serializers.ModelSerializer):
+    author_profile = UserProfileDetailSerializer(source='author.profile', read_only=True)
+    author_username = serializers.CharField(source='author.username', read_only=True)
+    likes_count = serializers.SerializerMethodField()
+    is_liked = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = ThreadCommentReply
+        fields = [
+            'id',
+            'comment',
+            'author',
+            'author_username',
+            'author_profile',
+            'content',
+            'created_at',
+            'likes_count',
+            'is_liked'
+        ]
+        read_only_fields = ['author', 'created_at']
+    
+    def get_likes_count(self, obj):
+        return obj.likes.count()
+    
+    def get_is_liked(self, obj):
+        request = self.context.get('request')
+        if request and request.user.is_authenticated:
+            return ThreadCommentReplyLike.objects.filter(reply=obj, user=request.user).exists()
+        return False
         
 class ThreadLikeSerializer(serializers.ModelSerializer):
     user_username = serializers.CharField(source='user.username', read_only=True)
