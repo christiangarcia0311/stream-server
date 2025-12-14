@@ -4,12 +4,13 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.parsers import MultiPartParser, FormParser
 
-from .models import ThreadPost, ThreadComment, ThreadLike
+from .models import ThreadPost, ThreadComment, ThreadLike, ThreadCommentLike, ThreadCommentReply, ThreadCommentReplyLike
 from .serializers import (
     ThreadPostSerializer, 
     ThreadPostCreateSerializer, 
     ThreadCommentSerializer,
-    ThreadLikeSerializer
+    ThreadLikeSerializer,
+    ThreadCommentReplySerializer,
 )
 
 from notifications.utils import (
@@ -180,3 +181,78 @@ class ThreadLikeToggleView(APIView):
         else:
             like.delete()
             return Response({'message': 'Unliked', 'likes_count': thread.likes.count(), 'is_liked': False}, status=status.HTTP_200_OK)
+        
+        
+class ThreadCommentLikeToggleView(APIView):
+    '''API endpoint to like/unlike a comment'''
+    
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, pk):
+        try:
+            comment = ThreadComment.objects.get(pk=pk)
+        except ThreadComment.DoesNotExist:
+            return Response({'error': 'Comment not found'}, status=status.HTTP_404_NOT_FOUND)
+
+        like, created = ThreadCommentLike.objects.get_or_create(comment=comment, user=request.user)
+        if created:
+            return Response({
+                'message': 'Liked', 
+                'likes_count': comment.likes.count(), 
+                'is_liked': True
+            }, status=status.HTTP_201_CREATED)
+        else:
+            like.delete()
+            return Response({
+                'message': 'Unliked', 
+                'likes_count': comment.likes.count(), 
+                'is_liked': False
+            }, status=status.HTTP_200_OK)
+
+class ThreadCommentReplyListCreateView(APIView):
+    '''API endpoint for retrieving and creating replies to a comment'''
+    
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, pk):
+        replies = ThreadCommentReply.objects.filter(comment_id=pk)
+        serializer = ThreadCommentReplySerializer(replies, many=True, context={'request': request})
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def post(self, request, pk):
+        try:
+            comment = ThreadComment.objects.get(pk=pk)
+        except ThreadComment.DoesNotExist:
+            return Response({'error': 'Comment not found'}, status=status.HTTP_404_NOT_FOUND)
+
+        serializer = ThreadCommentReplySerializer(data=request.data, context={'request': request})
+        if serializer.is_valid():
+            reply = serializer.save(author=request.user, comment=comment)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class ThreadCommentReplyLikeToggleView(APIView):
+    '''API endpoint to like/unlike a reply'''
+    
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, pk):
+        try:
+            reply = ThreadCommentReply.objects.get(pk=pk)
+        except ThreadCommentReply.DoesNotExist:
+            return Response({'error': 'Reply not found'}, status=status.HTTP_404_NOT_FOUND)
+
+        like, created = ThreadCommentReplyLike.objects.get_or_create(reply=reply, user=request.user)
+        if created:
+            return Response({
+                'message': 'Liked', 
+                'likes_count': reply.likes.count(), 
+                'is_liked': True
+            }, status=status.HTTP_201_CREATED)
+        else:
+            like.delete()
+            return Response({
+                'message': 'Unliked', 
+                'likes_count': reply.likes.count(), 
+                'is_liked': False
+            }, status=status.HTTP_200_OK)
