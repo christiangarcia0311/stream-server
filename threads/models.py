@@ -50,3 +50,37 @@ class ThreadLike(models.Model):
 
     def __str__(self):
         return f'Like by {self.user.username} on {self.thread.id}'
+    
+class ThreadCommentLike(models.Model):
+    comment = models.ForeignKey('ThreadComment', on_delete=models.CASCADE, related_name='likes')
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='comment_likes')
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        unique_together = ('comment', 'user')
+
+    def __str__(self):
+        return f'Like by {self.user.username} on comment {self.comment.id}'
+
+class ThreadCommentReply(models.Model):
+    comment = models.ForeignKey('ThreadComment', on_delete=models.CASCADE, related_name='replies')
+    author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='comment_replies')
+    content = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        ordering = ['created_at']
+
+    def __str__(self):
+        return f'Reply by {self.author.username} on comment {self.comment.id}'
+
+class ThreadCommentReplyLike(models.Model):
+    reply = models.ForeignKey('ThreadCommentReply', on_delete=models.CASCADE, related_name='likes')
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='reply_likes')
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        unique_together = ('reply', 'user')
+
+    def __str__(self):
+        return f'Like by {self.user.username} on reply {self.reply.id}'
