@@ -137,3 +137,33 @@ def create_reply_notification(reply, comment, user):
             reply=reply,
             message=f'{user_name} replied to your comment'
         )
+
+
+def create_announcement_notification(thread, author):
+    
+    '''
+    Create notification for all users when an announcement is posted
+    Uses bulk_create for better performance when notifying all users
+    '''
+    
+    from django.contrib.auth.models import User
+    
+    # Get all users except the author
+    all_users = User.objects.exclude(id=author.id)
+    
+    author_name = f"{author.profile.firstname} {author.profile.lastname}" if hasattr(author, 'profile') else author.username
+    
+    notifications = []
+    for user in all_users:
+        notifications.append(
+            Notification(
+                recipient=user,
+                sender=author,
+                notification_type='announcement',
+                thread=thread,
+                message=f'{author_name} posted an announcement: "{thread.title}"'
+            )
+        )
+    
+    if notifications:
+        Notification.objects.bulk_create(notifications)
