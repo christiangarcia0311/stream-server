@@ -379,9 +379,9 @@ class OTPVerifyView(APIView):
         if not otp_obj.secret:
             return Response({'error': 'No OTP secret available for this user'}, status=status.HTTP_400_BAD_REQUEST)
 
-        totp = pyotp.TOTP(otp_obj.secret)
+        totp = pyotp.TOTP(otp_obj.secret, interval=60)  # 1 minute validity
 
-        if totp.verify(otp_code, valid_window=1):
+        if totp.verify(otp_code, valid_window=0):
             otp_obj.is_verified = True
             otp_obj.save()
             user.is_active = True
