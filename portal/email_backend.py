@@ -12,6 +12,7 @@ class APIEmailBackend(BaseEmailBackend):
                 "to": message.to,
                 "subject": message.subject,
                 "body": message.body,
+                "from": "Stream <emailsender880@gmail.com>",
             }
            
             response = requests.post(
