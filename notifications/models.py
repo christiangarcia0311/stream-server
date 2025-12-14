@@ -8,7 +8,10 @@ class Notification(models.Model):
         ('like', 'Like'),
         ('comment', 'Comment'),
         ('follow', 'Follow'),
-        ('new_post', 'New Post')
+        ('new_post', 'New Post'),
+        ('like_comment', 'Like Comment'),
+        ('like_reply', 'Like Reply'),
+        ('reply_comment', 'Reply Comment')
     )
     
     recipient = models.ForeignKey(
@@ -35,6 +38,13 @@ class Notification(models.Model):
     )
     comment = models.ForeignKey(
         'threads.ThreadComment', 
+        on_delete=models.CASCADE, 
+        null=True, 
+        blank=True,
+        related_name='notifications'
+    )
+    reply = models.ForeignKey(
+        'threads.ThreadCommentReply', 
         on_delete=models.CASCADE, 
         null=True, 
         blank=True,
