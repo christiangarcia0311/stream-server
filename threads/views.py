@@ -19,7 +19,8 @@ from notifications.utils import (
     create_new_post_notification,
     create_comment_like_notification,
     create_reply_like_notification,
-    create_reply_notification
+    create_reply_notification,
+    create_announcement_notification
 )
 
 class ThreadPostListView(APIView):
@@ -46,7 +47,13 @@ class ThreadPostCreateView(APIView):
         if serializer.is_valid():
             thread = serializer.save(author=request.user)
     
-            create_new_post_notification(thread, request.user)
+            # Check if thread is an announcement
+            if thread.thread_type == 'announcement':
+                # Notify all users about the announcement
+                create_announcement_notification(thread, request.user)
+            else:
+                # Notify only followers about regular posts
+                create_new_post_notification(thread, request.user)
             
             response_serializer = ThreadPostSerializer(thread, context={'request': request}) 
             
