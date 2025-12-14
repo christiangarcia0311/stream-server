@@ -14,6 +14,8 @@ from datetime import timedelta
 from pathlib import Path
 import os 
 
+import cloudinary
+import cloudinary_storage
 
 # database url 
 import dj_database_url
@@ -200,6 +202,14 @@ DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL')
 # --- MEDIA FILES CONFIGURATION ---
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+# -- CORS CONFIGURATION --
+
+CORS_ALLOWED_ORIGINS = [
+    "https://snsu-community-forum-app.vercel.app",
+    "http://localhost:8100"
+]
+CORS_ALLOW_CREDENTIALS = True
 
 
 # -- JAZZMIN CONFIGURATION --
